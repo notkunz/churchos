@@ -34,3 +34,44 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+# ChurchOS
+
+Church management software built for Nigerian churches.
+
+## Features
+- Member directory with department tracking
+- Sunday attendance marking
+- Tithe and offering records (general + individual)
+- Automatic follow-up list for cold members
+- Monthly financial and attendance reports
+- Event management
+- Church announcements
+- 30-day free trial with Paystack subscription
+
+## Tech Stack
+- Next.js 15 (App Router)
+- TypeScript
+- Supabase (auth + database)
+- Tailwind CSS
+- Paystack
+- Python (report export scripts)
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Add `.env.local`:
+
+## Scripts
+```bash
+pip install -r scripts/requirements.txt
+python scripts/generate_report.py
+```
+
+## License
+MIT
