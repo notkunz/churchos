@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import EmptyState from '@/components/EmptyState'
+import EmptyState from "@/components/EmptyState";
 
 type Transaction = {
   id: string;
@@ -22,7 +22,7 @@ type TransactionForm = {
 };
 
 export default function TransactionsPage() {
-  const metadata = { title: 'Transactions' }
+  const metadata = { title: "Transactions" };
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [churchId, setChurchId] = useState("");
@@ -252,7 +252,7 @@ export default function TransactionsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
@@ -292,14 +292,14 @@ export default function TransactionsPage() {
               </tr>
             ))}
             {transactions.length === 0 && (
-             <tr>
-  <td colSpan={5}>
-    <EmptyState
-      title="No transactions yet"
-      description="Start recording tithes and offerings to track your church finances."
-    />
-  </td>
-</tr>
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    title="No transactions yet"
+                    description="Start recording tithes and offerings to track your church finances."
+                  />
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

@@ -1,5 +1,6 @@
 import Sidebar from "@/components/Sidebar";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import ErrorBoundaryWrapper from "@/components/ErrorBoundaryWrapper";
+import TrialBanner from "@/components/TrialBanner";
 
 export default function DashboardLayout({
   children,
@@ -10,7 +11,8 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <div className="md:ml-56 pt-14 md:pt-0">
-        <ErrorBoundary>{children}</ErrorBoundary>
+        <TrialBanner />
+        <ErrorBoundaryWrapper>{children}</ErrorBoundaryWrapper>
       </div>
     </div>
   );

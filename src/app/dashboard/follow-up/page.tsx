@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import EmptyState from '@/components/EmptyState'
+import EmptyState from "@/components/EmptyState";
 
 type MemberAttendance = {
   id: string;
@@ -13,7 +13,7 @@ type MemberAttendance = {
 };
 
 export default function FollowUpPage() {
-  const metadata = { title: 'Follow-up' }
+  const metadata = { title: "Follow-up" };
   const [members, setMembers] = useState<MemberAttendance[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -132,7 +132,7 @@ export default function FollowUpPage() {
         ))}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
@@ -179,14 +179,14 @@ export default function FollowUpPage() {
               </tr>
             ))}
             {members.length === 0 && (
-             <tr>
-  <td colSpan={5}>
-    <EmptyState
-      title="No follow-ups needed"
-      description="All active members have attended recently. Keep it up."
-    />
-  </td>
-</tr>
+              <tr>
+                <td colSpan={5}>
+                  <EmptyState
+                    title="No follow-ups needed"
+                    description="All active members have attended recently. Keep it up."
+                  />
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

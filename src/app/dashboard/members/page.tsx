@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import EmptyState from '@/components/EmptyState'
+import EmptyState from "@/components/EmptyState";
 
 type Member = {
   id: string;
@@ -21,7 +21,7 @@ type MemberForm = {
 };
 
 export default function MembersPage() {
-  const metadata = { title: 'Members' }
+  const metadata = { title: "Members" };
   const [members, setMembers] = useState<Member[]>([]);
   const [churchId, setChurchId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -159,7 +159,7 @@ export default function MembersPage() {
         className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm outline-none focus:border-blue-500 mb-4 bg-white"
       />
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
@@ -219,16 +219,16 @@ export default function MembersPage() {
               </tr>
             ))}
             {filtered.length === 0 && (
-<tr>
-  <td colSpan={6}>
-    <EmptyState
-      title="No members yet"
-      description="Start building your member directory by adding your first member."
-      actionLabel="Add Member"
-      actionHref="#"
-    />
-  </td>
-</tr>
+              <tr>
+                <td colSpan={6}>
+                  <EmptyState
+                    title="No members yet"
+                    description="Start building your member directory by adding your first member."
+                    actionLabel="Add Member"
+                    actionHref="#"
+                  />
+                </td>
+              </tr>
             )}
           </tbody>
         </table>

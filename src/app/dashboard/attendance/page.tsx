@@ -6,7 +6,7 @@ type Member = { id: string; full_name: string; department: string };
 type AttendanceMap = Record<string, boolean>;
 
 export default function AttendancePage() {
-  const metadata = { title: 'Attendance' }
+  const metadata = { title: "Attendance" };
   const [members, setMembers] = useState<Member[]>([]);
   const [attendance, setAttendance] = useState<AttendanceMap>({});
   const [churchId, setChurchId] = useState("");
@@ -130,7 +130,7 @@ export default function AttendancePage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
