@@ -1,35 +1,27 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import EmptyState from '@/components/EmptyState'
+import { getChurchId, supabase } from "@/lib/supabase";
+import EmptyState from "@/components/EmptyState";
 
 type Announcement = { id: string; message: string; created_at: string };
 
 export default function AnnouncementsPage() {
-  const metadata = { title: 'Announcements' }
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [churchId, setChurchId] = useState("");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) return;
-    setChurchId(church.id);
-    fetchAnnouncements(church.id);
+    const churchId = await getChurchId();
+    if (!churchId) return;
+    setChurchId(churchId);
+    fetchAnnouncements(churchId);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
 
   const fetchAnnouncements = async (id: string) => {
     const { data } = await supabase
@@ -124,10 +116,10 @@ export default function AnnouncementsPage() {
           </div>
         ))}
         {announcements.length === 0 && (
-         <EmptyState
-  title="No announcements yet"
-  description="Post your first announcement to keep your church informed."
-/>
+          <EmptyState
+            title="No announcements yet"
+            description="Post your first announcement to keep your church informed."
+          />
         )}
       </div>
     </div>

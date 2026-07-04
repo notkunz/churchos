@@ -1,12 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 
 type Member = { id: string; full_name: string; department: string };
 type AttendanceMap = Record<string, boolean>;
 
 export default function AttendancePage() {
-  const metadata = { title: "Attendance" };
   const [members, setMembers] = useState<Member[]>([]);
   const [attendance, setAttendance] = useState<AttendanceMap>({});
   const [churchId, setChurchId] = useState("");
@@ -15,28 +14,14 @@ export default function AttendancePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    init();
-  }, []);
-  useEffect(() => {
-    if (churchId) fetchAttendance();
-  }, [date, churchId]);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) return;
-    setChurchId(church.id);
+    const churchId = await getChurchId();
+    if (!churchId) return;
+    setChurchId(churchId);
     const { data } = await supabase
       .from("members")
       .select("id, full_name, department")
-      .eq("church_id", church.id)
+      .eq("church_id", churchId)
       .eq("is_active", true)
       .order("full_name");
     setMembers(data ?? []);
@@ -55,6 +40,16 @@ export default function AttendancePage() {
     });
     setAttendance(map);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
+
+  useEffect(() => {
+    if (churchId) {
+      void fetchAttendance();
+    }
+  }, [date, churchId]);
 
   const toggle = (id: string) => {
     setAttendance((prev) => ({ ...prev, [id]: !prev[id] }));

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import EmptyState from '@/components/EmptyState'
+import { getChurchId, supabase } from "@/lib/supabase";
+import EmptyState from "@/components/EmptyState";
 
 type Event = {
   id: string;
@@ -18,7 +18,6 @@ type EventForm = {
 };
 
 export default function EventsPage() {
-  const metadata = { title: 'Events' }
   const [events, setEvents] = useState<Event[]>([]);
   const [churchId, setChurchId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -30,23 +29,16 @@ export default function EventsPage() {
     location: "",
   });
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) return;
-    setChurchId(church.id);
-    fetchEvents(church.id);
+    const churchId = await getChurchId();
+    if (!churchId) return;
+    setChurchId(churchId);
+    fetchEvents(churchId);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
 
   const fetchEvents = async (id: string) => {
     const { data } = await supabase
@@ -204,10 +196,10 @@ export default function EventsPage() {
           </div>
         ))}
         {upcoming.length === 0 && (
-        <EmptyState
-  title="No upcoming events"
-  description="Add your first event so members know what to look forward to."
-/>
+          <EmptyState
+            title="No upcoming events"
+            description="Add your first event so members know what to look forward to."
+          />
         )}
       </div>
 

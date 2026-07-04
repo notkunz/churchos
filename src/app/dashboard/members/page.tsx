@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 import EmptyState from "@/components/EmptyState";
 
 type Member = {
@@ -21,7 +21,6 @@ type MemberForm = {
 };
 
 export default function MembersPage() {
-  const metadata = { title: "Members" };
   const [members, setMembers] = useState<Member[]>([]);
   const [churchId, setChurchId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -35,24 +34,16 @@ export default function MembersPage() {
     join_date: "",
   });
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (church) {
-      setChurchId(church.id);
-      fetchMembers(church.id);
-    }
+    const churchId = await getChurchId();
+    if (!churchId) return;
+    setChurchId(churchId);
+    fetchMembers(churchId);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
 
   const fetchMembers = async (id: string) => {
     const { data } = await supabase

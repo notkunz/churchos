@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 
 export default function SubscribePage() {
   const [church, setChurch] = useState<{
@@ -10,22 +10,25 @@ export default function SubscribePage() {
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const churchId = await getChurchId();
+    if (!churchId) {
+      setLoading(false);
+      return;
+    }
+
     const { data } = await supabase
       .from("churches")
       .select("id, name, trial_ends_at")
-      .eq("email", user?.email)
+      .eq("id", churchId)
       .single();
     setChurch(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
 
   const handlePayment = () => {
     const handler = (window as any).PaystackPop.setup({

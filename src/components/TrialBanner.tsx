@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 import Link from "next/link";
 
 export default function TrialBanner() {
@@ -9,13 +9,13 @@ export default function TrialBanner() {
 
   useEffect(() => {
     const check = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const churchId = await getChurchId();
+      if (!churchId) return;
+
       const { data } = await supabase
         .from("churches")
         .select("is_subscribed, trial_ends_at, subscription_ends_at")
-        .eq("email", user?.email)
+        .eq("id", churchId)
         .single();
 
       if (!data) return;
@@ -38,7 +38,7 @@ export default function TrialBanner() {
         setIsSubscribed(false);
       }
     };
-    check();
+    void check();
   }, []);
 
   if (daysLeft === null || daysLeft > 10) return null;

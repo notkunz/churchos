@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 import EmptyState from "@/components/EmptyState";
 
 type Transaction = {
@@ -22,7 +22,6 @@ type TransactionForm = {
 };
 
 export default function TransactionsPage() {
-  const metadata = { title: "Transactions" };
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [churchId, setChurchId] = useState("");
@@ -37,24 +36,17 @@ export default function TransactionsPage() {
     note: "",
   });
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) return;
-    setChurchId(church.id);
-    await Promise.all([fetchTransactions(church.id), fetchMembers(church.id)]);
+    const churchId = await getChurchId();
+    if (!churchId) return;
+    setChurchId(churchId);
+    await Promise.all([fetchTransactions(churchId), fetchMembers(churchId)]);
     setLoading(false);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
 
   const fetchTransactions = async (id: string) => {
     const { data } = await supabase

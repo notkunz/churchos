@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 import EmptyState from "@/components/EmptyState";
 
 type MemberAttendance = {
@@ -13,29 +13,17 @@ type MemberAttendance = {
 };
 
 export default function FollowUpPage() {
-  const metadata = { title: "Follow-up" };
   const [members, setMembers] = useState<MemberAttendance[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) return;
+    const churchId = await getChurchId();
+    if (!churchId) return;
 
     const { data: allMembers } = await supabase
       .from("members")
       .select("id, full_name, phone, department")
-      .eq("church_id", church.id)
+      .eq("church_id", churchId)
       .eq("is_active", true);
 
     if (!allMembers) {
@@ -78,6 +66,10 @@ export default function FollowUpPage() {
     setMembers(results);
     setLoading(false);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
 
   const urgencyColor = (weeks: number) => {
     if (weeks >= 8) return "bg-red-50 text-red-600";

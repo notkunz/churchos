@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 
 type ReportData = {
   totalMembers: number;
@@ -14,33 +14,28 @@ type ReportData = {
 };
 
 export default function ReportsPage() {
-  const metadata = { title: 'Reports' }
   const [report, setReport] = useState<ReportData | null>(null);
   const [churchId, setChurchId] = useState("");
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
 
-  useEffect(() => {
-    init();
-  }, []);
-  useEffect(() => {
-    if (churchId) fetchReport(churchId);
-  }, [month, year, churchId]);
-
   const init = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) return;
-    setChurchId(church.id);
-    fetchReport(church.id);
+    const churchId = await getChurchId();
+    if (!churchId) return;
+    setChurchId(churchId);
+    fetchReport(churchId);
   };
+
+  useEffect(() => {
+    void init();
+  }, []);
+
+  useEffect(() => {
+    if (churchId) {
+      void fetchReport(churchId);
+    }
+  }, [month, year, churchId]);
 
   const fetchReport = async (id: string) => {
     setLoading(true);

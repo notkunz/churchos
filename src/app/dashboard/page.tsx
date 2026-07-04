@@ -1,11 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { getChurchId, supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
-
 export default function Dashboard() {
-  const metadata = { title: 'Dashboard' }
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     totalMembers: 0,
@@ -23,20 +21,11 @@ export default function Dashboard() {
   }, []);
 
   const fetchStats = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data: church } = await supabase
-      .from("churches")
-      .select("id")
-      .eq("email", user?.email)
-      .single();
-    if (!church) {
+    const churchId = await getChurchId();
+    if (!churchId) {
       setLoading(false);
       return;
     }
-
-    const churchId = church.id;
     const today = new Date();
     const day = today.getDay();
     const lastSunday = new Date(today);
@@ -58,14 +47,22 @@ export default function Dashboard() {
         .eq("church_id", churchId)
         .eq("service_date", lastSundayStr)
         .eq("present", true),
-supabase.from('transactions').select('amount, type').eq('church_id', churchId).gte('date', firstOfMonth),      supabase
+      supabase
+        .from("transactions")
+        .select("amount, type")
+        .eq("church_id", churchId)
+        .gte("date", firstOfMonth),
+      supabase
         .from("events")
         .select("id", { count: "exact" })
         .eq("church_id", churchId)
         .gte("event_date", today.toISOString().split("T")[0]),
     ]);
 
-   const totalTithe = tithe.data?.filter(t => t.type === 'tithe').reduce((sum, t) => sum + Number(t.amount), 0) ?? 0
+    const totalTithe =
+      tithe.data
+        ?.filter((t) => t.type === "tithe")
+        .reduce((sum, t) => sum + Number(t.amount), 0) ?? 0;
     setStats({
       totalMembers: members.count ?? 0,
       lastSundayAttendance: attendance.count ?? 0,
@@ -103,4 +100,3 @@ supabase.from('transactions').select('amount, type').eq('church_id', churchId).g
     </div>
   );
 }
-
