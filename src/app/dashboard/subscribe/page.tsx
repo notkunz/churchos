@@ -30,16 +30,44 @@ export default function SubscribePage() {
     void init();
   }, []);
 
-  const handlePayment = () => {
-    const handler = (window as any).PaystackPop.setup({
+  const handlePayment = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    type PaystackHandler = {
+      openIframe: () => void;
+    };
+
+    type PaystackPop = {
+      setup: (options: {
+        key: string | undefined;
+        email: string | undefined;
+        amount: number;
+        currency: string;
+        ref: string;
+        metadata: { church_id: string | undefined };
+        callback: (response: { reference: string }) => void;
+        onClose: () => void;
+      }) => PaystackHandler;
+    };
+
+    const PaystackPop = (window as Window & { PaystackPop?: PaystackPop })
+      .PaystackPop;
+
+    if (!PaystackPop) {
+      alert("Payment system still loading, try again.");
+      return;
+    }
+
+    const handler = PaystackPop.setup({
       key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-      email: "",
-      amount: 1000000, // ₦10,000 in kobo
+      email: user?.email,
+      amount: 1000000,
       currency: "NGN",
       ref: `churchos_${church?.id}_${Date.now()}`,
       metadata: { church_id: church?.id },
       callback: async (response: { reference: string }) => {
-        // verify on backend
         await fetch("/api/verify-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -52,6 +80,7 @@ export default function SubscribePage() {
       },
       onClose: () => {},
     });
+
     handler.openIframe();
   };
 
