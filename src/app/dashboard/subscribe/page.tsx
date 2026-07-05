@@ -67,16 +67,17 @@ export default function SubscribePage() {
       currency: "NGN",
       ref: `churchos_${church?.id}_${Date.now()}`,
       metadata: { church_id: church?.id },
-      callback: async (response: { reference: string }) => {
-        await fetch("/api/verify-payment", {
+      callback: (response: { reference: string }) => {
+        fetch("/api/verify-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             reference: response.reference,
             church_id: church?.id,
           }),
+        }).then(() => {
+          window.location.href = "/dashboard";
         });
-        window.location.href = "/dashboard";
       },
       onClose: () => {},
     });
